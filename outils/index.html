@@ -15,12 +15,24 @@
 <meta property="og:url" content="https://exemple.ch/outils/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b6e6e'/%3E%3Cpath d='M4 25 13 9l5 8 3-4 7 12z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/cime.css">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://exemple.ch/"}, {"@type": "ListItem", "position": 2, "name": "Simulateurs gratuits", "item": "https://exemple.ch/outils/"}]}]}</script>
 </head>
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+ <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.6 4.2-2.2 1.4a11 11 0 0 0 5.5 5.5l1.4-2.2L19 14.5V18a1.5 1.5 0 0 1-1.6 1.5A14.5 14.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></symbol>
+ <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5"/><path d="M6 10.5V19h12v-8.5"/><path d="M10 19v-5h4v5"/></symbol>
+ <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"/><path d="M3.5 12.5h17"/></symbol>
+ <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h14m-3-3 3 3-3 3"/><path d="M20 16H6m3 3-3-3 3-3"/></symbol>
+ <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+ <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M8.5 8h7M8.5 12.5h.01M12 12.5h.01M15.5 12.5h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 5 6v5.5c0 4.2 3 7.2 7 9 4-1.8 7-4.8 7-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+</svg>
 
 <header class="site">
  <div class="w">
@@ -36,10 +48,10 @@
    <a href="/profils/frontaliers/">Frontaliers</a>
   </nav>
   <div class="head-cta">
-   <a class="tel" href="tel:+41210000000" aria-label="Appeler Cime au 021 000 00 00"><span aria-hidden="true">📞</span> <span class="t">021 000 00 00</span></a>
+   <a class="tel" href="tel:+41210000000" aria-label="Appeler Cime au 021 000 00 00"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg> <span class="t">021 000 00 00</span></a>
    <a class="btn sm" href="/rendez-vous/" data-cta="header_rdv">Prendre RDV</a>
    <details class="menu">
-    <summary aria-label="Ouvrir le menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></summary>
+    <summary aria-label="Ouvrir le menu"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg></summary>
     <nav aria-label="Navigation mobile">
      <a href="/services/assurance-maladie-lamal-et-complementaires/">Assurance maladie LAMal</a>
      <a href="/services/optimisation-3e-pilier-3a-3b/">3e pilier 3a / 3b</a>
@@ -110,7 +122,7 @@
 </footer>
 
 <div class="sticky" aria-label="Contact rapide">
- <a class="btn ghost" href="tel:+41210000000" data-cta="sticky_tel">📞 Appeler</a>
+ <a class="btn ghost" href="tel:+41210000000" data-cta="sticky_tel"><svg class="i" aria-hidden="true"><use href="#i-phone"/></svg> Appeler</a>
  <a class="btn" href="/rendez-vous/" data-cta="sticky_rdv">Prendre RDV</a>
 </div>
 

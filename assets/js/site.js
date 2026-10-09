@@ -38,7 +38,7 @@
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var d={};new FormData(f).forEach(function(v,k){d[k]=v;});
-    d.canton=p.get('canton')||'';d.source=p.get('source')||'direct';d.page=location.pathname;d.ts=new Date().toISOString();
+    d.canton=p.get('canton')||'';d.versement=p.get('versement')||'';d.source=p.get('source')||'direct';d.page=location.pathname;d.ts=new Date().toISOString();
     var btn=f.querySelector('button[type=submit]');btn.disabled=true;
     window.CimeLead.send(d).then(function(r){
       btn.disabled=false;
@@ -47,4 +47,58 @@
       else{msg.textContent='Envoi impossible pour le moment. Appelez-nous au 021 000 00 00.';}
     });
   });
+})();
+
+/* Simulateur express de l'accueil : slider, canton, statut, calcul en temps réel. Aucune donnée n'est transmise. */
+(function(){
+  var root=document.getElementById('xs');
+  if(!root)return;
+  var C=window.CIME_CONFIG||{},PL=C.plafond3a||{salarie:7258,independant:36288};
+  var RATE={VD:29,GE:31,VS:25,FR:28,NE:30,JU:29};   // taux marginal moyen indicatif par canton (hypothèse, en %)
+  var YEARS=25,RET=2;                                // 25 ans de versements, rendement net 2 % (versements en fin d'année)
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $=function(id){return document.getElementById(id)};
+  var rng=$('xs-v'),vout=$('xs-vout'),eco=$('xs-eco'),cap=$('xs-cap'),rate=$('xs-rate'),canton=$('xs-canton'),btns=[].slice.call(root.querySelectorAll('[data-statut]'));
+  var st={statut:'salarie'},cur={eco:0,cap:0},raf={};
+  var fmt=function(n){return Math.round(n).toLocaleString('fr-CH').replace(/[\u202f\u00a0]/g,'\u2019')};
+  function tween(el,key,to){
+    cancelAnimationFrame(raf[key]);
+    if(reduce){cur[key]=to;el.textContent=fmt(to);return}
+    var from=cur[key],t0=null;
+    (function step(t){t0=t0||t;var k=Math.min(1,(t-t0)/260),e=1-Math.pow(1-k,3);cur[key]=from+(to-from)*e;el.textContent=fmt(cur[key]);if(k<1)raf[key]=requestAnimationFrame(step)})(performance.now());
+  }
+  function compute(){
+    var v=+rng.value,r=RATE[canton.value]||28,c=0;
+    for(var i=0;i<YEARS;i++)c=c*(1+RET/100)+v;
+    return{v:v,r:r,eco:v*r/100,cap:c};
+  }
+  function render(announce){
+    var o=compute(),max=+rng.max;
+    rng.style.setProperty('--p',(max?o.v/max*100:0)+'%');
+    vout.textContent=fmt(o.v)+' CHF';
+    rate.textContent='Taux marginal supposé : '+o.r+' %';
+    tween(eco,'eco',o.eco);tween(cap,'cap',o.cap);
+    var q='sujet=3a&profil='+(st.statut==='salarie'?'resident':'independant')+'&canton='+canton.value+'&versement='+Math.round(o.v)+'&source=hero_express';
+    $('xs-cta').href='/rendez-vous/?'+q;
+    $('xs-more').href='/outils/simulateur-3e-pilier/?statut='+st.statut+'&v='+Math.round(o.v)+'&t='+o.r;
+    if(announce)$('xs-sr').textContent='Versement '+fmt(o.v)+' francs : économie d’impôt estimée '+fmt(o.eco)+' francs par an, capital estimé à 65 ans '+fmt(o.cap)+' francs.';
+  }
+  function setStatut(s,focus){
+    st.statut=s;var max=PL[s];
+    btns.forEach(function(b){var on=b.dataset.statut===s;b.setAttribute('aria-checked',on);b.tabIndex=on?0:-1;if(on&&focus)b.focus()});
+    rng.max=max;rng.value=s==='salarie'?max:Math.min(20000,max);
+    $('xs-max').textContent=s==='salarie'?'Plafond 2026 : '+fmt(max)+' CHF':'Plafond 2026 : '+fmt(max)+' CHF (20 % du revenu net)';
+    render(true);
+  }
+  btns.forEach(function(b,i){
+    b.addEventListener('click',function(){setStatut(b.dataset.statut)});
+    b.addEventListener('keydown',function(e){
+      if(e.key==='ArrowRight'||e.key==='ArrowLeft'||e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();setStatut(btns[(i+1)%2].dataset.statut,true)}
+    });
+  });
+  rng.addEventListener('input',function(){render(false)});
+  rng.addEventListener('change',function(){render(true)});
+  canton.addEventListener('change',function(){render(true)});
+  // état initial sans animation
+  var o=compute();cur.eco=o.eco;cur.cap=o.cap;eco.textContent=fmt(o.eco);cap.textContent=fmt(o.cap);render(false);
 })();

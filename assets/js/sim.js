@@ -88,11 +88,11 @@ var TOOLS={
 /* ---------- Rendu ---------- */
 function build(root){
  var key=root.getAttribute('data-tool'),T=TOOLS[key];if(!T)return;
- var vals={};T.fields.forEach(function(f){vals[f.k]=f.v});
+ var vals={},qs=new URLSearchParams(location.search);T.fields.forEach(function(f){var q=qs.get(f.k);vals[f.k]=q!==null&&q!==''?(f.o?q:(parseFloat(q)||f.v)):f.v;f.cur=vals[f.k]});
  var form=document.createElement('div');form.className='card';
  form.innerHTML='<h2 style="font-size:1.5rem">'+T.title+'</h2>'+T.fields.map(function(f){
-  return f.o?'<label>'+f.l+'<select data-k="'+f.k+'">'+f.o.map(function(x){return'<option value="'+x[0]+'">'+x[1]+'</option>'}).join('')+'</select></label>'
-           :'<label>'+f.l+'<input type="number" inputmode="decimal" data-k="'+f.k+'" value="'+f.v+'" step="'+(f.step||'any')+'"></label>'}).join('');
+  return f.o?'<label>'+f.l+'<select data-k="'+f.k+'">'+f.o.map(function(x){return'<option value="'+x[0]+'"'+(x[0]===f.cur?' selected':'')+'>'+x[1]+'</option>'}).join('')+'</select></label>'
+           :'<label>'+f.l+'<input type="number" inputmode="decimal" data-k="'+f.k+'" value="'+f.cur+'" step="'+(f.step||'any')+'"></label>'}).join('');
  var out=document.createElement('div');out.className='card out';out.setAttribute('aria-live','polite');
  root.appendChild(form);root.appendChild(out);
  var started=false;
