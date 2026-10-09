@@ -1,0 +1,31 @@
+<!--title: Prendre rendez-vous : appel de 15 minutes offert | Cime-->
+<!--desc: Réservez un appel téléphonique de 15 minutes avec l'équipe conseil Cime. Analyse comparative offerte, sans engagement.-->
+<!--path: /rendez-vous/-->
+<!--crumbs: Rendez-vous|/rendez-vous/-->
+<section class="page-hero"><div class="w">{{CRUMBS}}
+<h1>Parlons de votre situation</h1>
+<p class="lead">15 minutes au téléphone avec notre équipe conseil. Une analyse comparative offerte, sans engagement. Nous vous rappelons au créneau de votre choix.</p></div></section>
+<div class="w" style="max-width:760px;padding-bottom:64px">
+<form class="form" id="rdv" action="#" method="post" data-endpoint="" data-mailto="contact@exemple.ch">
+ <div class="row">
+  <label>Prénom<input type="text" name="prenom" autocomplete="given-name" required></label>
+  <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" required></label>
+ </div>
+ <div class="row">
+  <label>E-mail (facultatif)<input type="email" name="email" autocomplete="email"></label>
+  <label>Créneau souhaité
+   <select name="creneau"><option>Matin (9 h – 12 h)</option><option>Midi (12 h – 14 h)</option><option>Après-midi (14 h – 18 h)</option><option>Soir (18 h – 20 h)</option></select>
+  </label>
+ </div>
+ <div class="row">
+  <label>Profil
+   <select name="profil"><option value="resident">Résident en Suisse</option><option value="independant">Indépendant</option><option value="frontalier">Frontalier</option></select>
+  </label>
+  <label>Sujet
+   <select name="sujet"><option value="3a">3e pilier 3a / 3b</option><option value="lpp">Rachat LPP / retraite</option><option value="lamal">Assurance maladie LAMal</option><option value="avs">AVS</option><option value="autre">Autre</option></select>
+  </label>
+ </div>
+ <label style="font-weight:400;display:flex;gap:10px;font-size:.9rem;color:var(--mut)"><input type="checkbox" name="consent" required style="margin-top:5px"><span>J'accepte que Cime utilise ces informations pour me rappeler, conformément à la <a href="/confidentialite/">politique de confidentialité</a> (nLPD).</span></label>
+ <button class="btn" type="submit" data-cta="rdv_submit">Demander mon rappel</button>
+ <p id="rdv-msg" class="note" role="status" style="margin:0">Vous préférez appeler ? <a href="tel:+41210000000">021 000 00 00</a>. Vos données ne sont jamais revendues.</p>
+</form></div>
