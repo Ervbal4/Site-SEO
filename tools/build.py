@@ -8,7 +8,7 @@ BASE = "https://exemple.ch"
 idx = (ROOT / "index.html").read_text(encoding="utf-8")
 chrome_top = idx[idx.index('<a class="skip"'):idx.index('<main')]
 chrome_bot = idx[idx.index('</main>'):]
-fonts = re.search(r'<link rel="preconnect".*?rel="stylesheet">', idx, re.S).group(0)
+fonts = "\n".join(re.findall(r'<link rel="preload"[^>]*>', idx))
 icon = re.search(r'<link rel="icon"[^>]*>', idx).group(0)
 
 def meta(src, k):
@@ -20,7 +20,7 @@ def build(f):
     title, desc, path = meta(src, "title"), meta(src, "desc"), meta(src, "path")
     typ = meta(src, "type") or "page"
     crumbs = [("Accueil", "/")] + [tuple(c.split("|")) for c in meta(src, "crumbs").split(";") if c]
-    body = re.sub(r'<!--(title|desc|path|crumbs|type):.*?-->\s*', '', src, flags=re.S)
+    body = re.sub(r'<!--(title|desc|path|crumbs|type|sujet|index):.*?-->\s*', '', src, flags=re.S)
     url = BASE + path
     h1 = re.search(r'<h1[^>]*>(.*?)</h1>', body, re.S).group(1)
     ld = [{"@type": "BreadcrumbList", "itemListElement": [
@@ -29,12 +29,23 @@ def build(f):
     if typ == "article":
         ld.append({"@type": "Article", "headline": re.sub('<.*?>', '', h1), "description": desc, "inLanguage": "fr-CH",
                    "mainEntityOfPage": url, "dateModified": "2026-10-09", "author": {"@id": BASE + "/#org"}, "publisher": {"@id": BASE + "/#org"}})
+    if typ == "article":
+        words = len(re.sub(r'<[^>]+>', ' ', body).split())
+        minutes = max(1, round(words / 220))
+        body = re.sub(r'(<p class="lead">.*?</p>)', r'\1\n<p class="meta">%d min de lecture</p>' % minutes, body, count=1, flags=re.S)
+        sujet = meta(src, "sujet") or "autre"
+        if 'class="cta-end"' not in body:
+            end = ('<div class="cta-end"><h3>Une question sur votre situation ?</h3><p>Un spécialiste peut examiner votre cas. Gratuit et sans engagement.</p>'
+                   '<div class="acts"><a class="btn" href="/rendez-vous/?demande=etude&amp;sujet=%s&amp;source=fin-article" data-cta="fin_etude">Demander une étude comparative gratuite</a>'
+                   '<a class="more" href="/rendez-vous/?demande=echange&amp;sujet=%s&amp;source=fin-article" data-cta="fin_echange">Échanger 15 min avec un spécialiste</a></div></div>\n') % (sujet, sujet)
+            body = body.replace('<p class="disc">', end + '<p class="disc">', 1)
     faq = re.findall(r'<details class="faq"><summary>(.*?)</summary><p>(.*?)</p></details>', body, re.S)
     if faq:
         ld.append({"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": re.sub('<.*?>', '', q),
                    "acceptedAnswer": {"@type": "Answer", "text": re.sub('<.*?>', '', a)}} for q, a in faq]})
     crumb_html = '<p class="crumbs"><a href="/">Accueil</a>' + "".join(f' › <a href="{u}">{n}</a>' for n, u in crumbs[1:]) + f' › {re.sub("<.*?>", "", h1)}</p>'
     body = body.replace("{{CRUMBS}}", crumb_html)
+    body = body.replace('<div class="tbl">', '<div class="tbl" tabindex="0" role="region" aria-label="Tableau, défilable horizontalement">')
     # sim.js doit s'exécuter après config.js et lead.js (chargés dans le pied de page) : on le place en dernier.
     extra = ""
     if '/assets/js/sim.js' in body:

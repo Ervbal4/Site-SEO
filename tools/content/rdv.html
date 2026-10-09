@@ -1,33 +1,38 @@
-<!--title: Prendre rendez-vous : appel de 15 minutes offert | Cime-->
-<!--desc: Réservez un appel téléphonique de 15 minutes avec l'équipe conseil Cime. Analyse comparative offerte, sans engagement.-->
+<!--title: Demander une étude ou prendre rendez-vous | Cime-->
+<!--desc: Demandez une étude comparative gratuite ou un échange de 15 minutes avec un spécialiste. Sans engagement. Vos données servent uniquement à traiter votre demande.-->
 <!--path: /rendez-vous/-->
-<!--crumbs: Rendez-vous|/rendez-vous/-->
+<!--crumbs: Demande|/rendez-vous/-->
 <section class="page-hero"><div class="w">{{CRUMBS}}
 <h1>Parlons de votre situation</h1>
-<p class="lead">15 minutes au téléphone avec notre équipe conseil. Une analyse comparative offerte, sans engagement. Nous vous rappelons au créneau de votre choix.</p></div></section>
-<div class="w" style="max-width:760px;padding-bottom:64px">
-<form class="form" id="rdv" action="#" method="post">
- <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+<p class="lead">Choisissez le type de demande et décrivez brièvement votre situation. Un spécialiste examine votre demande et revient vers vous. C’est gratuit et sans engagement.</p></div></section>
+<div class="w sec split rev">
+<form class="form form-card" id="rdv" action="#" method="post" novalidate>
+ <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+ <div class="fld"><label for="rdv-demande">Votre demande</label>
+  <select id="rdv-demande" name="demande"><option value="etude">Étude comparative gratuite</option><option value="echange">Échange de 15 minutes avec un spécialiste</option></select></div>
+ <div class="row"><div class="fld"><label for="rdv-prenom">Prénom</label><input id="rdv-prenom" type="text" name="prenom" autocomplete="given-name" required aria-required="true"><span class="field-err" id="err-prenom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-nom">Nom</label><input id="rdv-nom" type="text" name="nom" autocomplete="family-name" required aria-required="true"><span class="field-err" id="err-nom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
+ <div class="row"><div class="fld"><label for="rdv-tel">Téléphone</label><input id="rdv-tel" type="tel" name="tel" autocomplete="tel" required aria-required="true" inputmode="tel"><span class="field-err" id="err-tel-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-email">E-mail <span class="hint inl">(facultatif)</span></label><input id="rdv-email" type="email" name="email" autocomplete="email"><span class="field-err" id="err-email-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
  <div class="row">
-  <label>Prénom<input type="text" name="prenom" autocomplete="given-name" required></label>
-  <label>Téléphone<input type="tel" name="tel" autocomplete="tel" inputmode="tel" required></label>
+  <div class="fld"><label for="rdv-profil">Votre profil</label><select id="rdv-profil" name="profil"><option value="resident">Résident en Suisse</option><option value="independant">Indépendant</option><option value="frontalier">Frontalier</option></select></div>
+  <div class="fld"><label for="rdv-sujet">Sujet</label><select id="rdv-sujet" name="sujet"><option value="3a">3e pilier 3a / 3b</option><option value="lpp">Rachat LPP / retraite</option><option value="lamal">Assurance maladie LAMal</option><option value="avs">AVS</option><option value="autre">Autre</option></select></div>
  </div>
- <div class="row">
-  <label>E-mail (facultatif)<input type="email" name="email" autocomplete="email"></label>
-  <label>Créneau souhaité
-   <select name="creneau"><option>Matin (9 h – 12 h)</option><option>Midi (12 h – 14 h)</option><option>Après-midi (14 h – 18 h)</option><option>Soir (18 h – 20 h)</option></select>
-  </label>
- </div>
- <div class="row">
-  <label>Profil
-   <select name="profil"><option value="resident">Résident en Suisse</option><option value="independant">Indépendant</option><option value="frontalier">Frontalier</option></select>
-  </label>
-  <label>Sujet
-   <select name="sujet"><option value="3a">3e pilier 3a / 3b</option><option value="lpp">Rachat LPP / retraite</option><option value="lamal">Assurance maladie LAMal</option><option value="avs">AVS</option><option value="autre">Autre</option></select>
-  </label>
- </div>
- <label style="font-weight:400;display:flex;gap:10px;font-size:.9rem;color:var(--mut)"><input type="checkbox" name="consent" required style="margin-top:5px"><span>J'accepte que Cime utilise ces informations pour me rappeler, conformément à la <a href="/confidentialite/">politique de confidentialité</a> (nLPD).</span></label>
- <button class="btn" type="submit" data-cta="rdv_submit">Échanger 15 min avec un spécialiste</button>
- <p id="rdv-msg" class="note" role="status" style="margin:0">Vous préférez appeler ? <a href="tel:+41210000000">021 000 00 00</a>. Vos données ne sont jamais revendues.</p>
+ <div class="fld"><label for="rdv-creneau">Créneau souhaité <span class="hint inl">(facultatif)</span></label>
+  <select id="rdv-creneau" name="creneau"><option value="">Aucune préférence</option><option>Matin (9 h – 12 h)</option><option>Midi (12 h – 14 h)</option><option>Après-midi (14 h – 18 h)</option><option>Soir (18 h – 20 h)</option></select></div>
+ <div class="fld"><label class="chk" for="rdv-consent"><input id="rdv-consent" type="checkbox" name="consent" required aria-required="true"><span>J’accepte que Cime utilise ces informations pour traiter ma demande, conformément à la <a href="/confidentialite/">politique de confidentialité</a> (nLPD).</span></label><span class="field-err" id="err-consent-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div>
+ <div><button class="btn" type="submit" data-cta="rdv_submit">Envoyer ma demande</button></div>
+ <p id="rdv-msg" class="msg" role="status"></p>
 </form>
-<div id="booking" hidden style="margin-top:28px"><h2 style="font-size:1.6rem">Ou choisissez directement un créneau</h2></div></div>
+<aside>
+ <div class="aside-box">
+  <h3>Ce qui se passe ensuite</h3>
+  <ol>
+   <li>Votre demande nous parvient avec les informations saisies.</li>
+   <li>Un spécialiste l’examine et revient vers vous.</li>
+   <li>Selon votre choix : une étude comparative ou un échange de 15 minutes, gratuit et sans engagement.</li>
+  </ol>
+  <h3 class="mt-s">Vos données</h3>
+  <p class="cap">Votre nom, prénom, numéro de téléphone, e-mail et les sujets indiqués servent uniquement à traiter votre demande. Rien n’est envoyé tant que vous n’avez pas cliqué sur « Envoyer ma demande ».</p>
+ </div>
+ <div id="booking" hidden class="mt-m"><h3>Ou choisissez directement un créneau</h3></div>
+</aside>
+</div>
