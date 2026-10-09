@@ -771,3 +771,5 @@ footer.site .legal p{font-size:var(--fs-cap)}
 @media(max-width:960px){.sec-head-c{grid-template-columns:1fr;row-gap:var(--s-2)}}
 @media(max-width:560px){.sec-s{padding-block:28px}.stage{min-height:0}.figures .w{padding-block:20px}.figs>div{padding-bottom:var(--s-3)}.qlist-c a{padding:10px 4px}.topic{padding:var(--s-4)}}
 .faq-grid>*,.q-grid>*,.commit>*,.contact>*,.est-grid>*{min-width:0}
+.logo .w2{font-weight:700;color:var(--emerald);margin-left:-10px}
+footer.site .logo .w2{color:var(--on-petrol-accent)}

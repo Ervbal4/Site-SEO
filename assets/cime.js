@@ -95,7 +95,7 @@ var CimeLead=window.CimeLead=(function(){
     }
     if(cfg.mailto){
       var lines=Object.keys(payload).map(function(k){return k+' : '+payload[k]}).join('\n');
-      location.href='mailto:'+cfg.mailto+'?subject='+encodeURIComponent(subject||'Demande Cime')+'&body='+encodeURIComponent(lines);
+      location.href='mailto:'+cfg.mailto+'?subject='+encodeURIComponent(subject||'Demande assurémentSuisse')+'&body='+encodeURIComponent(lines);
       return Promise.resolve({mailto:true});
     }
     return Promise.resolve({unavailable:true});
@@ -154,7 +154,7 @@ $$('form[data-lead]').forEach(function(f){
     d.source=params.get('source')||f.getAttribute('data-source')||'direct';
     d.page=location.pathname;d.ts=new Date().toISOString();
     var btn=f.querySelector('button[type=submit]');btn.disabled=true;btn.setAttribute('aria-busy','true');
-    CimeLead.send(d,'Demande Cime – '+d.prenom+' '+d.nom).then(function(r){
+    CimeLead.send(d,'Demande assurémentSuisse – '+d.prenom+' '+d.nom).then(function(r){
       btn.disabled=false;btn.removeAttribute('aria-busy');
       if(CimeLead.report(msg,r)){f.reset();if(steps.length>1)show(0,false)}
     });

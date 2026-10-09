@@ -1,3 +1,12 @@
-Polices auto-hébergées (aucune requête vers Google Fonts, nLPD).
-- plus-jakarta-sans-var.woff2 : présente (copie de la variable Plus Jakarta Sans, licence OFL).
-- newsreader-var.woff2 : à ajouter (Newsreader variable, licence OFL). Sans ce fichier, un serif de secours est utilisé pour les titres.
+Polices auto-hébergées (conformité nLPD : aucune requête vers Google)
+
+Déposer ici deux fichiers WOFF2 variables, sous-ensemble latin :
+  plus-jakarta-sans-var.woff2   (Plus Jakarta Sans, axe wght)
+  newsreader-var.woff2          (Newsreader, axes opsz + wght)
+
+Où les obtenir (licence SIL Open Font License, usage commercial autorisé) :
+  - npm : @fontsource-variable/plus-jakarta-sans  -> files/plus-jakarta-sans-latin-wght-normal.woff2
+          @fontsource-variable/newsreader         -> files/newsreader-latin-full-normal.woff2 (ou latin-wght-normal)
+  - ou https://fonts.google.com (Télécharger), puis conversion TTF -> WOFF2.
+Renommer les fichiers exactement comme ci-dessus. Les règles @font-face sont dans ../cime.css.
+Tant que les fichiers sont absents, des polices de secours calibrées s'affichent.
