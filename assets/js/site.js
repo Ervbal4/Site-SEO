@@ -24,27 +24,27 @@
   });
 })();
 
-/* Formulaire de rendez-vous : préremplissage depuis l'URL, envoi vers un endpoint (CRM) ou repli e-mail. */
+/* Formulaire de rendez-vous : préremplissage depuis l'URL, envoi au webhook (CimeLead), widget de réservation facultatif. */
 (function(){
   var f=document.getElementById('rdv');
   if(!f)return;
-  var p=new URLSearchParams(location.search);
+  var C=window.CIME_CONFIG||{},p=new URLSearchParams(location.search);
   ['profil','sujet'].forEach(function(k){if(p.get(k)&&f.elements[k])f.elements[k].value=p.get(k);});
-  var msg=document.getElementById('rdv-msg');
+  var msg=document.getElementById('rdv-msg'),box=document.getElementById('booking');
+  if(box&&C.booking&&C.booking.url){
+    var fr=document.createElement('iframe');fr.src=C.booking.url;fr.title='Réserver un créneau avec un spécialiste';fr.loading='lazy';fr.style.cssText='width:100%;height:720px;border:0;border-radius:16px;background:var(--card)';
+    box.appendChild(fr);box.hidden=false;
+  }
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var d={};new FormData(f).forEach(function(v,k){d[k]=v;});
-    d.canton=p.get('canton')||'';d.source=p.get('source')||'direct';d.page=location.pathname;
-    try{window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'lead_submit',profil:d.profil,sujet:d.sujet});}catch(_){}
-    var ep=f.getAttribute('data-endpoint');
-    if(ep){
-      fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})
-        .then(function(r){if(!r.ok)throw 0;f.reset();msg.textContent='Merci ! Nous vous rappelons au créneau choisi.';})
-        .catch(function(){msg.textContent='Envoi impossible pour le moment. Appelez-nous au 021 000 00 00.';});
-    }else{
-      var body=Object.keys(d).map(function(k){return k+' : '+d[k];}).join('\n');
-      location.href='mailto:'+f.getAttribute('data-mailto')+'?subject='+encodeURIComponent('Demande de rappel Cime')+'&body='+encodeURIComponent(body);
-      msg.textContent='Votre messagerie s\'ouvre avec la demande préremplie. Il ne reste qu\'à l\'envoyer.';
-    }
+    d.canton=p.get('canton')||'';d.source=p.get('source')||'direct';d.page=location.pathname;d.ts=new Date().toISOString();
+    var btn=f.querySelector('button[type=submit]');btn.disabled=true;
+    window.CimeLead.send(d).then(function(r){
+      btn.disabled=false;
+      if(r.ok){f.reset();msg.textContent='Merci ! Un spécialiste vous rappelle au créneau choisi.';}
+      else if(r.fallback){window.CimeLead.mailto('Demande de rappel Cime',d);msg.textContent='Votre messagerie s\'ouvre avec la demande préremplie : il ne reste qu\'à l\'envoyer.';}
+      else{msg.textContent='Envoi impossible pour le moment. Appelez-nous au 021 000 00 00.';}
+    });
   });
 })();

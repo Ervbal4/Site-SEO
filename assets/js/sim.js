@@ -10,13 +10,13 @@ var state={};            // résultats de tous les simulateurs de la page (envoy
 var track=function(e,p){try{window.dataLayer=window.dataLayer||[];window.dataLayer.push(Object.assign({event:e},p||{}))}catch(_){}};
 
 /* ---------- Règles de calcul ---------- */
-var R0=C.avsRenteMin||1260;
+var R0=C.avsRenteMin||1260,LPP_MAX=90720; // salaire maximal LPP (3 × rente AVS maximale de 30 240 CHF)
 // Rente AVS mensuelle (échelle 44), selon le revenu annuel moyen E et les années de cotisation n.
 function avsR(E,n){var Ee=Math.ceil(E/(1.2*R0)-1e-9)*1.2*R0,r=Ee<=12*R0?R0:Ee<=36*R0?.74*R0+13*Ee/600:Ee<72*R0?1.04*R0+8*Ee/600:2*R0;return Math.round((n>=44?1:Math.max(0,n)/44)*r)}
 // Bonifications de vieillesse LPP (minimum légal) par âge.
 function brk(a){return a>=55?.18:a>=45?.15:a>=35?.10:a>=25?.07:0}
-// Avoir LPP à la retraite : salaire coordonné (déduction 26 460 CHF, salaire maximal assuré 88 200 CHF), rendement constant.
-function lppFin(o,rachat){var x=o.lpp,sc=Math.max(0,Math.min(o.sal,88200)-26460);for(var a=o.age;a<o.ret;a++){x+=x*o.rg/100+sc*brk(a)+(a===o.age?rachat:0)}return x}
+// Avoir LPP à la retraite : salaire coordonné (déduction 26 460 CHF, salaire maximal assuré 90 720 CHF, soit un salaire coordonné maximal de 64 260 CHF), rendement constant.
+function lppFin(o,rachat){var x=o.lpp,sc=Math.max(0,Math.min(o.sal,LPP_MAX)-26460);for(var a=o.age;a<o.ret;a++){x+=x*o.rg/100+sc*brk(a)+(a===o.age?rachat:0)}return x}
 // Coût annuel LAMal pour des frais de santé X : prime + franchise + quote-part de 10 % (max. 700 CHF).
 function lamalCost(prime,fr,X){return prime+Math.min(X,fr)+Math.min(Math.max(0,X-fr)*.1,700)}
 
@@ -47,7 +47,7 @@ var TOOLS={
  'lpp':{title:'Simulateur rachat LPP',sujet:'lpp',
   fields:[{k:'age',l:'Âge actuel',v:45},{k:'ret',l:'Âge de la retraite',v:65},{k:'lpp',l:'Avoir LPP actuel (CHF)',v:150000},{k:'sal',l:'Salaire annuel brut (CHF)',v:80000},
    {k:'rach',l:'Rachat envisagé (CHF)',v:50000},{k:'rg',l:'Rendement de l’avoir (%)',v:1.5,step:.1},{k:'t',l:'Taux marginal d’impôt estimé (%)',v:30,step:.5},{k:'conv',l:'Taux de conversion (%)',v:5,step:.1}],
-  calc:function(o){var a=lppFin(o,0),b=lppFin(o,o.rach),eco=o.rach*o.t/100,se=function(r){var x=o.lpp,out=[x],sc=Math.max(0,Math.min(o.sal,88200)-26460);for(var g=o.age;g<o.ret;g++){x+=x*o.rg/100+sc*brk(g)+(g===o.age?r:0);out.push(x)}return out};
+  calc:function(o){var a=lppFin(o,0),b=lppFin(o,o.rach),eco=o.rach*o.t/100,se=function(r){var x=o.lpp,out=[x],sc=Math.max(0,Math.min(o.sal,LPP_MAX)-26460);for(var g=o.age;g<o.ret;g++){x+=x*o.rg/100+sc*brk(g)+(g===o.age?r:0);out.push(x)}return out};
    var s0=se(0),s1=se(o.rach);
    var h='<h3>Avoir LPP à '+o.ret+' ans</h3><table><tr><td>Sans rachat</td><td><b>'+fmt(a)+'</b></td></tr><tr><td>Avec rachat</td><td><b>'+fmt(b)+'</b></td></tr><tr><td>Rente annuelle estimée ('+String(o.conv).replace('.',',')+' %)</td><td><b>'+fmt(a*o.conv/100)+' → '+fmt(b*o.conv/100)+'</b></td></tr><tr><td>Économie d’impôt sur le rachat</td><td><b>'+fmt(eco)+'</b></td></tr><tr><td>Coût net du rachat</td><td><b>'+fmt(o.rach-eco)+'</b></td></tr></table>'+
    '<p class="note">Un retrait en capital dans les 3 ans suivant un rachat peut remettre en cause la déduction. Le montant maximal dépend de la lacune indiquée sur votre certificat.</p>'+
@@ -68,15 +68,18 @@ var TOOLS={
    var e=function(n){return fmt(n,'€')};
    var xs=[30,50,70,90,110,130,150].map(function(k){return k*1e3});
    var h='<h3>Comparaison annuelle</h3><table><tr><td>CMU (8 % après abattement)</td><td><b>'+e(cm)+'</b></td></tr><tr><td>LAMal (primes converties en €)</td><td><b>'+e(la)+'</b></td></tr><tr><td><b>'+(d>0?'LAMal moins chère de':d<0?'CMU moins chère de':'Écart')+'</b></td><td><b>'+e(Math.abs(d))+'</b> / an</td></tr></table>'+
+   '<p>Surcoût LAMal par personne supplémentaire : <b>'+e(o.pa*12*o.fx)+'</b> / an par adulte et <b>'+e(o.pe*12*o.fx)+'</b> / an par enfant. En CMU, le conjoint et les enfants sont généralement couverts sans cotisation supplémentaire.</p>'+
    '<p>Avec ces primes, les deux options s’équilibrent autour d’un revenu fiscal de référence d’environ <b>'+e(be)+'</b>.</p>'+
    '<p class="note">La CMU couvre tout le foyer avec une cotisation unique ; la LAMal se paie par personne. Le droit d’option se prend dans les 3 mois suivant le début d’activité et se révise difficilement. Vérifiez l’abattement et le taux auprès de l’URSSAF.</p>'+
    '<h3 style="margin-top:20px;font-size:1.15rem">Coût selon votre revenu de référence (€)</h3>'+lineC([{n:'CMU',c:COL[1],v:xs.map(function(r){return Math.max(0,r-o.ab)*.08})},{n:'LAMal',c:COL[0],v:xs.map(function(){return la})}],xs.map(fs));
    return{html:h,sim:{cmu_eur:Math.round(cm),lamal_eur:Math.round(la)}}}},
  'franchise':{title:'Simulateur franchise LAMal',sujet:'lamal',
   fields:[{k:'p1',l:'Prime annuelle, franchise basse (CHF)',v:5400},{k:'f1',l:'Franchise basse (CHF)',v:300},{k:'p2',l:'Prime annuelle, franchise haute (CHF)',v:4200},{k:'f2',l:'Franchise haute (CHF)',v:2500},{k:'x',l:'Frais de santé annuels attendus (CHF)',v:800}],
-  calc:function(o){var a=lamalCost(o.p1,o.f1,o.x),b=lamalCost(o.p2,o.f2,o.x),d=a-b;
+  calc:function(o){var a=lamalCost(o.p1,o.f1,o.x),b=lamalCost(o.p2,o.f2,o.x),d=a-b,seuil=null;
+   for(var X=0;X<=30000;X+=10){if(lamalCost(o.p1,o.f1,X)<=lamalCost(o.p2,o.f2,X)){seuil=X;break}}
    var xs=[0,500,1000,1500,2000,3000,4000,6000,8000],pts=xs.map(function(x){return[lamalCost(o.p1,o.f1,x),lamalCost(o.p2,o.f2,x)]});
    var h='<h3>Coût annuel total (prime + frais à votre charge)</h3><table><tr><td>Franchise '+fmt(o.f1)+'</td><td><b>'+fmt(a)+'</b></td></tr><tr><td>Franchise '+fmt(o.f2)+'</td><td><b>'+fmt(b)+'</b></td></tr><tr><td><b>'+(d>0?'Franchise haute plus avantageuse de':d<0?'Franchise basse plus avantageuse de':'Écart')+'</b></td><td><b>'+fmt(Math.abs(d))+'</b></td></tr></table>'+
+   '<p>'+(seuil===null?'Dans cette configuration, la franchise haute reste plus avantageuse jusqu’à 30 000 CHF de frais.':seuil===0?'La franchise basse est plus avantageuse quels que soient vos frais.':'<b>Seuil de bascule : environ '+fmt(seuil)+' de frais de santé par an.</b> En dessous, la franchise haute coûte moins cher ; au-dessus, la franchise basse devient plus avantageuse.')+'</p>'+
    '<p>Risque maximal : '+fmt(o.p1+o.f1+700)+' (franchise basse) contre '+fmt(o.p2+o.f2+700)+' (franchise haute).</p><h3 style="margin-top:20px;font-size:1.15rem">Coût selon vos frais de santé</h3>'+
    lineC([{n:'Franchise basse',c:COL[1],v:pts.map(function(p){return p[0]})},{n:'Franchise haute',c:COL[0],v:pts.map(function(p){return p[1]})}],xs.map(fs));
    return{html:h,sim:{cout_basse:Math.round(a),cout_haute:Math.round(b)}}}}
@@ -103,15 +106,20 @@ document.querySelectorAll('.sim[data-tool]').forEach(build);
 var cta=$('#sim-cta');
 if(cta){
  var sujet=(TOOLS[(document.querySelector('.sim[data-tool]')||{getAttribute:function(){}}).getAttribute('data-tool')]||{}).sujet||'autre';
- cta.innerHTML='<div class="cta-in" style="max-width:none"><h3>Recevez l’étude complète ou parlez-en avec l’équipe</h3><p>Nous reprenons votre simulation, la vérifions avec vos documents (certificat de prévoyance, décompte de contrat, prime actuelle) et vous remettons une analyse comparative. Gratuit, sans engagement.</p>'+
- '<form id="etude" class="form" style="background:transparent;border:0;padding:0;color:var(--ink)"><div class="row"><label style="color:#fff">Prénom<input type="text" name="prenom" required autocomplete="given-name"></label><label style="color:#fff">E-mail<input type="email" name="email" required autocomplete="email"></label></div>'+
+ cta.innerHTML='<div class="cta-in" style="max-width:none"><h3>Demandez une étude comparative gratuite ou échangez avec un spécialiste</h3><p>Nous reprenons votre simulation, la vérifions avec vos documents (certificat de prévoyance, décompte de contrat, prime actuelle) et vous remettons une étude comparative. Gratuit, sans engagement.</p>'+
+ '<form id="etude" class="form" style="background:transparent;border:0;padding:0;color:var(--ink)"><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><div class="row"><label style="color:#fff">Prénom<input type="text" name="prenom" required autocomplete="given-name"></label><label style="color:#fff">E-mail<input type="email" name="email" required autocomplete="email"></label></div>'+
  '<label style="font-weight:400;display:flex;gap:10px;font-size:.88rem;color:#dbe7ee"><input type="checkbox" name="consent" required style="margin-top:5px"><span>J’accepte que Cime utilise ces informations pour m’envoyer l’étude, conformément à la <a href="/confidentialite/" style="color:#fff">politique de confidentialité</a> (nLPD).</span></label>'+
- '<div class="acts" style="margin:0"><button class="btn" type="submit" data-cta="sim_etude">Recevoir l’étude complète</button><a class="btn ghost" id="sim-rdv" href="/rendez-vous/?sujet='+sujet+'&source=simulateur" data-cta="sim_rdv">Réserver 15 minutes avec l’équipe</a></div><p id="etude-msg" role="status" style="margin:0"></p></form></div>';
+ '<div class="acts" style="margin:0"><button class="btn" type="submit" data-cta="sim_etude">Demander une étude comparative gratuite</button><a class="btn ghost" id="sim-rdv" href="/rendez-vous/?sujet='+sujet+'&source=simulateur" data-cta="sim_rdv">Échanger 15 min avec un spécialiste</a></div><p id="etude-msg" role="status" style="margin:0"></p></form></div>';
  $('#etude').addEventListener('submit',function(e){
-  e.preventDefault();var f=e.target,d={type:'etude',prenom:f.prenom.value.trim(),email:f.email.value.trim(),consent:true,page:location.pathname,simulation:state,ts:new Date().toISOString()},msg=$('#etude-msg');
-  track('lead_submit',{source:'simulateur',tool:Object.keys(state).join(',')});
-  if(C.endpoint){fetch(C.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){if(!r.ok)throw 0;f.reset();msg.textContent='Merci ! Nous vous envoyons l’étude très prochainement.'}).catch(function(){msg.textContent='Envoi impossible pour le moment. Appelez-nous au 021 000 00 00.'})}
-  else{location.href='mailto:'+(C.mailto||'')+'?subject='+encodeURIComponent('Demande d’étude Cime')+'&body='+encodeURIComponent('Prénom : '+d.prenom+'\nE-mail : '+d.email+'\nPage : '+d.page+'\n\nSimulation :\n'+JSON.stringify(state,null,1));msg.textContent='Votre messagerie s’ouvre avec la demande préremplie : il ne reste qu’à l’envoyer.'}
+  e.preventDefault();var f=e.target,msg=$('#etude-msg'),btn=f.querySelector('button[type=submit]');
+  var d={type:'etude',prenom:f.prenom.value.trim(),email:f.email.value.trim(),consent:'oui',website:f.website.value,source:'simulateur',sujet:sujet,page:location.pathname,simulation:state,ts:new Date().toISOString()};
+  btn.disabled=true;
+  window.CimeLead.send(d).then(function(r){
+   btn.disabled=false;
+   if(r.ok){f.reset();msg.textContent='Merci ! Un spécialiste vous envoie l’étude très prochainement.'}
+   else if(r.fallback){window.CimeLead.mailto('Demande d’étude Cime',d);msg.textContent='Votre messagerie s’ouvre avec la demande préremplie : il ne reste qu’à l’envoyer.'}
+   else{msg.textContent='Envoi impossible pour le moment. Appelez-nous au 021 000 00 00.'}
+  });
  });
 }
 })();

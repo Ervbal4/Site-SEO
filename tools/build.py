@@ -35,6 +35,11 @@ def build(f):
                    "acceptedAnswer": {"@type": "Answer", "text": re.sub('<.*?>', '', a)}} for q, a in faq]})
     crumb_html = '<p class="crumbs"><a href="/">Accueil</a>' + "".join(f' › <a href="{u}">{n}</a>' for n, u in crumbs[1:]) + f' › {re.sub("<.*?>", "", h1)}</p>'
     body = body.replace("{{CRUMBS}}", crumb_html)
+    # sim.js doit s'exécuter après config.js et lead.js (chargés dans le pied de page) : on le place en dernier.
+    extra = ""
+    if '/assets/js/sim.js' in body:
+        body = re.sub(r'<script src="/assets/js/sim\.js" defer></script>\s*', '', body)
+        extra = '<script src="/assets/js/sim.js" defer></script>\n'
     robots = '' if meta(src, "index") != "no" else '<meta name="robots" content="noindex">\n'
     out = f'''<!DOCTYPE html>
 <html lang="fr-CH">
@@ -57,8 +62,9 @@ def build(f):
 <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": ld}, ensure_ascii=False)}</script>
 </head>
 <body>
-{chrome_top}{body}
-{chrome_bot}'''
+{chrome_top}<main id="contenu" tabindex="-1">
+{body}
+{chrome_bot.replace('</body>', extra + '</body>')}'''
     dest = ROOT / path.strip("/") / "index.html"
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(out, encoding="utf-8")
