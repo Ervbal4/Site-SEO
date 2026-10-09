@@ -39,6 +39,10 @@ def build(f):
                    '<div class="acts"><a class="btn" href="/rendez-vous/?demande=etude&amp;sujet=%s&amp;source=fin-article" data-cta="fin_etude">Demander une étude comparative gratuite</a>'
                    '<a class="more" href="/rendez-vous/?demande=echange&amp;sujet=%s&amp;source=fin-article" data-cta="fin_echange">Échanger 15 min avec un spécialiste</a></div></div>\n') % (sujet, sujet)
             body = body.replace('<p class="disc">', end + '<p class="disc">', 1)
+    if path.startswith("/outils/") and path != "/outils/":
+        ld.append({"@type": "WebApplication", "name": re.sub('<.*?>', '', h1), "url": url, "applicationCategory": "FinanceApplication",
+                   "operatingSystem": "Web", "inLanguage": "fr-CH", "description": desc,
+                   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "CHF"}})
     faq = re.findall(r'<details class="faq"><summary>(.*?)</summary><p>(.*?)</p></details>', body, re.S)
     if faq:
         ld.append({"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": re.sub('<.*?>', '', q),
@@ -52,6 +56,13 @@ def build(f):
         body = re.sub(r'<script src="/assets/js/sim\.js" defer></script>\s*', '', body)
         extra = '<script src="/assets/js/sim.js" defer></script>\n'
     robots = '' if meta(src, "index") != "no" else '<meta name="robots" content="noindex">\n'
+    NAV = {"/prevoyance/": ("/prevoyance/", "/services/"), "/fiscalite/": ("/fiscalite/",), "/retraite/": ("/retraite/",),
+           "/outils/": ("/outils/",), "/a-propos/": ("/a-propos/",)}
+    top = chrome_top
+    for href, prefixes in NAV.items():
+        if any(path.startswith(pf) for pf in prefixes):
+            top = top.replace('<nav class="main" aria-label="Navigation principale">', '<nav class="main" aria-label="Navigation principale">', 1)
+            top = re.sub(r'(<nav class="main".*?)<a href="%s">' % re.escape(href), r'\1<a href="%s" aria-current="page">' % href, top, count=1, flags=re.S)
     out = f'''<!DOCTYPE html>
 <html lang="fr-CH">
 <head>
@@ -73,7 +84,7 @@ def build(f):
 <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": ld}, ensure_ascii=False)}</script>
 </head>
 <body>
-{chrome_top}<main id="contenu" tabindex="-1">
+{top}<main id="contenu" tabindex="-1">
 {body}
 {chrome_bot.replace('</body>', extra + '</body>')}'''
     dest = ROOT / path.strip("/") / "index.html"

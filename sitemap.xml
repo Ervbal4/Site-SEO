@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
  <url><loc>https://exemple.ch/</loc></url>
+ <url><loc>https://exemple.ch/a-propos/</loc></url>
  <url><loc>https://exemple.ch/guides/3a-banque-vs-assurance/</loc></url>
  <url><loc>https://exemple.ch/guides/frontalier-lamal-ou-cmu/</loc></url>
  <url><loc>https://exemple.ch/guides/</loc></url>
  <url><loc>https://exemple.ch/guides/independant-prevoyance-sans-lpp/</loc></url>
  <url><loc>https://exemple.ch/guides/rachat-lpp-deduction-impots/</loc></url>
+ <url><loc>https://exemple.ch/fiscalite/</loc></url>
+ <url><loc>https://exemple.ch/prevoyance/</loc></url>
+ <url><loc>https://exemple.ch/retraite/</loc></url>
  <url><loc>https://exemple.ch/mentions-legales/</loc></url>
  <url><loc>https://exemple.ch/confidentialite/</loc></url>
  <url><loc>https://exemple.ch/outils/simulateur-3e-pilier/</loc></url>

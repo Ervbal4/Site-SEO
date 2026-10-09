@@ -34,6 +34,9 @@
  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/></symbol>
  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5h.01"/></symbol>
  <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/></symbol>
+ <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+ <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/></symbol>
 </svg>
 
 <header class="site">
@@ -42,26 +45,30 @@
    <svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M2 27 13 8l5.5 9 3.5-5 8 15z"/></svg>Cime
   </a>
   <nav class="main" aria-label="Navigation principale">
-   <a href="/services/assurance-maladie-lamal-et-complementaires/">LAMal</a>
-   <a href="/services/optimisation-3e-pilier-3a-3b/">3e pilier</a>
-   <a href="/services/prevoyance-professionnelle-lpp-retraite/">LPP &amp; retraite</a>
-   <a href="/guides/">Guides</a>
+   <a href="/prevoyance/" aria-current="page">Prévoyance</a>
+   <a href="/fiscalite/">Fiscalité</a>
+   <a href="/retraite/">Retraite</a>
    <a href="/outils/">Simulateurs</a>
-   <a href="/profils/frontaliers/">Frontaliers</a>
+   <a href="/a-propos/">À propos</a>
   </nav>
   <div class="head-cta">
    <a class="btn sm" href="/rendez-vous/?demande=etude&amp;source=header" data-cta="header_etude">Demander une étude</a>
-   <details class="menu">
-    <summary aria-label="Ouvrir le menu"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg></summary>
+   <details class="menu" id="menu">
+    <summary aria-label="Menu"><svg class="i" aria-hidden="true"><use href="#i-menu"/></svg></summary>
     <nav aria-label="Navigation mobile">
-     <a href="/services/assurance-maladie-lamal-et-complementaires/">Assurance maladie LAMal</a>
-     <a href="/services/optimisation-3e-pilier-3a-3b/">3e pilier 3a / 3b</a>
-     <a href="/services/prevoyance-professionnelle-lpp-retraite/">LPP &amp; retraite</a>
+     <a href="/prevoyance/">Prévoyance</a>
+     <a class="sub" href="/services/optimisation-3e-pilier-3a-3b/">3e pilier 3a / 3b</a>
+     <a class="sub" href="/services/prevoyance-professionnelle-lpp-retraite/">LPP et retraite</a>
+     <a class="sub" href="/services/assurance-maladie-lamal-et-complementaires/">LAMal et complémentaires</a>
+     <a href="/fiscalite/">Fiscalité</a>
+     <a href="/retraite/">Retraite</a>
+     <a href="/outils/">Simulateurs</a>
      <a href="/guides/">Guides</a>
-     <a href="/outils/">Simulateurs gratuits</a>
-     <a href="/profils/residents/">Résidents</a>
-     <a href="/profils/independants/">Indépendants</a>
-     <a href="/profils/frontaliers/">Frontaliers</a>
+     <a href="/a-propos/">À propos</a>
+     <a class="sub" href="/profils/residents/">Résidents</a>
+     <a class="sub" href="/profils/independants/">Indépendants</a>
+     <a class="sub" href="/profils/frontaliers/">Frontaliers</a>
+     <a class="cta" href="/rendez-vous/?demande=etude&amp;source=menu" data-cta="menu_etude">Demander une étude comparative gratuite</a>
     </nav>
    </details>
   </div>
@@ -146,40 +153,56 @@
 
 </main>
 
+<!-- 10. PIED DE PAGE -->
 <footer class="site">
  <div class="w">
   <div class="cols">
    <div>
-    <a class="logo" href="/">Cime</a>
-    <p>Portail d’information et de simulation sur la prévoyance, la fiscalité et l’assurance maladie en Suisse.</p>
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M2 27 13 8l5.5 9 3.5-5 8 15z"/></svg>Cime</a>
+    <p>Portail d’information et de simulation sur la prévoyance, la fiscalité et l’assurance maladie en Suisse romande.</p>
    </div>
    <div>
-    <h3>Sujets</h3>
+    <h3>Prévoyance</h3>
     <ul>
-     <li><a href="/services/assurance-maladie-lamal-et-complementaires/">LAMal et complémentaires</a></li>
+     <li><a href="/prevoyance/">Les trois piliers</a></li>
      <li><a href="/services/optimisation-3e-pilier-3a-3b/">3e pilier 3a / 3b</a></li>
      <li><a href="/services/prevoyance-professionnelle-lpp-retraite/">LPP et retraite</a></li>
+     <li><a href="/services/assurance-maladie-lamal-et-complementaires/">LAMal et complémentaires</a></li>
     </ul>
    </div>
    <div>
-    <h3>Outils et guides</h3>
+    <h3>Fiscalité et retraite</h3>
     <ul>
-     <li><a href="/outils/">Simulateurs gratuits</a></li>
+     <li><a href="/fiscalite/">Fiscalité</a></li>
+     <li><a href="/retraite/">Retraite</a></li>
      <li><a href="/guides/">Tous les guides</a></li>
-     <li><a href="/profils/frontaliers/">Frontaliers</a></li>
-     <li><a href="/profils/independants/">Indépendants</a></li>
+     <li><a href="/guides/rachat-lpp-deduction-impots/">Rachat LPP et impôts</a></li>
     </ul>
    </div>
    <div>
-    <h3>Contact</h3>
+    <h3>Simulateurs</h3>
     <ul>
-     <li><a href="/rendez-vous/?demande=etude&amp;source=footer">Demander une étude comparative</a></li>
-     <li><a href="/rendez-vous/?demande=echange&amp;source=footer">Échanger 15 min avec un spécialiste</a></li>
+     <li><a href="/outils/simulateur-3e-pilier/">3e pilier</a></li>
+     <li><a href="/outils/simulateur-rachat-lpp/">Rachat LPP</a></li>
+     <li><a href="/outils/simulateur-avs/">Rente AVS</a></li>
+     <li><a href="/outils/simulateur-lamal-cmu/">LAMal, CMU, franchise</a></li>
+    </ul>
+   </div>
+   <div>
+    <h3>Cime</h3>
+    <ul>
+     <li><a href="/a-propos/">À propos</a></li>
+     <li><a href="/profils/residents/">Résidents</a></li>
+     <li><a href="/profils/independants/">Indépendants</a></li>
+     <li><a href="/profils/frontaliers/">Frontaliers</a></li>
+     <li><a href="/rendez-vous/?demande=etude&amp;source=footer">Demander une étude</a></li>
     </ul>
    </div>
   </div>
-  <p><strong>Usage pédagogique.</strong> Les contenus et simulations de ce site sont des informations générales et indicatives. Ils ne remplacent pas une analyse personnalisée. Les règles varient selon le canton et votre situation. Sources de référence : OFAS (ofas.admin.ch), AFC (estv.admin.ch), administrations fiscales cantonales.</p>
-  <p><strong>Vos données (nLPD).</strong> Les simulateurs fonctionnent sans compte et dans votre navigateur. Vos données ne sont transmises que si vous envoyez une demande. <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a></p>
+  <div class="legal">
+   <p><strong>Usage pédagogique.</strong> Les contenus et simulations de ce site sont des informations générales et indicatives. Ils ne remplacent pas une analyse personnalisée. Les règles varient selon le canton et votre situation. Sources de référence : OFAS (ofas.admin.ch), AFC (estv.admin.ch), administrations fiscales cantonales.</p>
+   <p><strong>Vos données (nLPD).</strong> Les simulateurs fonctionnent sans compte et dans votre navigateur. Vos données ne sont transmises que si vous envoyez une demande. <a href="/confidentialite/">Politique de confidentialité</a> · <a href="/mentions-legales/">Mentions légales</a></p>
+  </div>
  </div>
 </footer>
 

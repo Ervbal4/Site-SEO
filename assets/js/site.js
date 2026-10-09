@@ -24,7 +24,7 @@
   });
 })();
 
-/* Formulaire de rendez-vous / demande d'étude. */
+/* Formulaire de rendez-vous / demande d'étude, en 2 étapes. */
 (function(){
   var f=document.getElementById('rdv');
   if(!f)return;
@@ -35,14 +35,27 @@
     var fr=document.createElement('iframe');fr.src=C.booking.url;fr.title='Réserver un créneau avec un spécialiste';fr.loading='lazy';fr.className='booking-frame';
     box.appendChild(fr);box.hidden=false;
   }
+  // étapes : sans JavaScript, les deux blocs restent visibles
+  var st=[document.getElementById('rdv-step1'),document.getElementById('rdv-step2')],prog=document.getElementById('rdv-prog'),progl=document.getElementById('rdv-progl'),bars=prog.querySelectorAll('i');
+  var next=document.getElementById('rdv-next'),back=document.getElementById('rdv-back'),cur=0,TITLES=['Votre demande','Vos coordonnées'];
+  function show(n,focus){
+    cur=n;st.forEach(function(s,i){s.hidden=i!==n});
+    progl.textContent='Étape '+(n+1)+' sur 2 · '+TITLES[n];
+    [].forEach.call(bars,function(b,i){b.className=i<=n?'on':''});
+    if(focus)(n?f.elements.prenom:f.elements.demande).focus();
+  }
+  prog.hidden=false;next.hidden=false;back.hidden=false;show(0,false);
+  next.addEventListener('click',function(){show(1,true)});
+  back.addEventListener('click',function(){show(0,true)});
   L.watch(f);
   f.addEventListener('submit',function(e){
     e.preventDefault();
+    if(cur===0){show(1,true);return}
     if(L.validate(f,{prenom:true,nom:true,tel:true,email:false,consent:true})){L.status(msg,'err','Certains champs sont à corriger avant l’envoi.');return}
     var d={};new FormData(f).forEach(function(v,k){d[k]=v});
     d.canton=p.get('canton')||'';d.versement=p.get('versement')||'';d.source=p.get('source')||'direct';d.page=location.pathname;d.ts=new Date().toISOString();
-    var btn=f.querySelector('button[type=submit]');btn.disabled=true;
-    L.send(d,'Demande Cime').then(function(r){btn.disabled=false;if(L.report(msg,r))f.reset()});
+    var btn=f.querySelector('button[type=submit]');btn.disabled=true;btn.setAttribute('aria-busy','true');
+    L.send(d,'Demande Cime').then(function(r){btn.disabled=false;btn.removeAttribute('aria-busy');if(L.report(msg,r)){f.reset();show(0,false)}});
   });
 })();
 
@@ -120,4 +133,33 @@
   bar.classList.add('wait');
   function upd(){bar.classList.toggle('wait',hero.getBoundingClientRect().bottom>0)}
   addEventListener('scroll',upd,{passive:true});upd();
+})();
+
+/* Tiroir de navigation mobile : fermeture au clavier (Échap), au clic hors du panneau, à la navigation. */
+(function(){
+  var m=document.getElementById('menu');
+  if(!m)return;
+  function close(focus){if(m.open){m.open=false;if(focus)m.querySelector('summary').focus()}}
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close(true)});
+  document.addEventListener('click',function(e){if(!m.open)return;if(e.target===m||e.target.closest('#menu nav a'))close(false)});
+  addEventListener('resize',function(){if(innerWidth>1020)close(false)});
+})();
+
+/* Panneaux (<dialog class="panel">) : ouverture, fermeture, clic sur le fond. */
+(function(){
+  document.addEventListener('click',function(e){
+    var o=e.target.closest('[data-dialog]');
+    if(o){var d=document.getElementById(o.getAttribute('data-dialog'));if(d&&d.showModal)d.showModal();return}
+    if(e.target.closest('[data-close]')){var p=e.target.closest('dialog');if(p)p.close();return}
+    if(e.target.tagName==='DIALOG'&&e.target.classList.contains('panel'))e.target.close();
+  });
+})();
+
+/* Sommaire des articles : met en évidence la section en cours de lecture. */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  if(!links.length||!('IntersectionObserver' in window))return;
+  var map={};links.forEach(function(a){var t=document.getElementById(a.getAttribute('href').slice(1));if(t)map[t.id]=a});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.remove('on')});map[e.target.id].classList.add('on')}})},{rootMargin:'-20% 0px -70% 0px'});
+  Object.keys(map).forEach(function(id){io.observe(document.getElementById(id))});
 })();

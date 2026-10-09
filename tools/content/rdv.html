@@ -2,24 +2,37 @@
 <!--desc: Demandez une étude comparative gratuite ou un échange de 15 minutes avec un spécialiste. Sans engagement. Vos données servent uniquement à traiter votre demande.-->
 <!--path: /rendez-vous/-->
 <!--crumbs: Demande|/rendez-vous/-->
-<section class="page-hero"><div class="w">{{CRUMBS}}
+<section class="page-hero fam-profils"><div class="w">{{CRUMBS}}
 <h1>Parlons de votre situation</h1>
 <p class="lead">Choisissez le type de demande et décrivez brièvement votre situation. Un spécialiste examine votre demande et revient vers vous. C’est gratuit et sans engagement.</p></div></section>
 <div class="w sec split rev">
 <form class="form form-card" id="rdv" action="#" method="post" novalidate>
  <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
- <div class="fld"><label for="rdv-demande">Votre demande</label>
-  <select id="rdv-demande" name="demande"><option value="etude">Étude comparative gratuite</option><option value="echange">Échange de 15 minutes avec un spécialiste</option></select></div>
- <div class="row"><div class="fld"><label for="rdv-prenom">Prénom</label><input id="rdv-prenom" type="text" name="prenom" autocomplete="given-name" required aria-required="true"><span class="field-err" id="err-prenom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-nom">Nom</label><input id="rdv-nom" type="text" name="nom" autocomplete="family-name" required aria-required="true"><span class="field-err" id="err-nom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
- <div class="row"><div class="fld"><label for="rdv-tel">Téléphone</label><input id="rdv-tel" type="tel" name="tel" autocomplete="tel" required aria-required="true" inputmode="tel"><span class="field-err" id="err-tel-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-email">E-mail <span class="hint inl">(facultatif)</span></label><input id="rdv-email" type="email" name="email" autocomplete="email"><span class="field-err" id="err-email-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
- <div class="row">
-  <div class="fld"><label for="rdv-profil">Votre profil</label><select id="rdv-profil" name="profil"><option value="resident">Résident en Suisse</option><option value="independant">Indépendant</option><option value="frontalier">Frontalier</option></select></div>
-  <div class="fld"><label for="rdv-sujet">Sujet</label><select id="rdv-sujet" name="sujet"><option value="3a">3e pilier 3a / 3b</option><option value="lpp">Rachat LPP / retraite</option><option value="lamal">Assurance maladie LAMal</option><option value="avs">AVS</option><option value="autre">Autre</option></select></div>
+ <div id="rdv-prog" hidden>
+  <p class="progress" id="rdv-progl">Étape 1 sur 2 · Votre demande</p>
+  <div class="progress-bar" aria-hidden="true"><i class="on"></i><i></i></div>
  </div>
- <div class="fld"><label for="rdv-creneau">Créneau souhaité <span class="hint inl">(facultatif)</span></label>
-  <select id="rdv-creneau" name="creneau"><option value="">Aucune préférence</option><option>Matin (9 h – 12 h)</option><option>Midi (12 h – 14 h)</option><option>Après-midi (14 h – 18 h)</option><option>Soir (18 h – 20 h)</option></select></div>
- <div class="fld"><label class="chk" for="rdv-consent"><input id="rdv-consent" type="checkbox" name="consent" required aria-required="true"><span>J’accepte que Cime utilise ces informations pour traiter ma demande, conformément à la <a href="/confidentialite/">politique de confidentialité</a> (nLPD).</span></label><span class="field-err" id="err-consent-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div>
- <div><button class="btn" type="submit" data-cta="rdv_submit">Envoyer ma demande</button></div>
+ <fieldset class="step" id="rdv-step1"><legend>Votre demande</legend>
+  <div class="form">
+   <div class="fld"><label for="rdv-demande">Type de demande</label>
+    <select id="rdv-demande" name="demande"><option value="etude">Étude comparative gratuite</option><option value="echange">Échange de 15 minutes avec un spécialiste</option></select></div>
+   <div class="row">
+    <div class="fld"><label for="rdv-profil">Votre profil</label><select id="rdv-profil" name="profil"><option value="resident">Résident en Suisse</option><option value="independant">Indépendant</option><option value="frontalier">Frontalier</option></select></div>
+    <div class="fld"><label for="rdv-sujet">Sujet</label><select id="rdv-sujet" name="sujet"><option value="3a">3e pilier 3a / 3b</option><option value="lpp">Rachat LPP / retraite</option><option value="lamal">Assurance maladie LAMal</option><option value="avs">AVS</option><option value="autre">Autre</option></select></div>
+   </div>
+   <div class="fld"><label for="rdv-creneau">Créneau souhaité <span class="hint inl">(facultatif)</span></label>
+    <select id="rdv-creneau" name="creneau"><option value="">Aucune préférence</option><option>Matin (9 h – 12 h)</option><option>Midi (12 h – 14 h)</option><option>Après-midi (14 h – 18 h)</option><option>Soir (18 h – 20 h)</option></select></div>
+   <div class="form-nav"><button type="button" class="btn" id="rdv-next" hidden>Continuer</button></div>
+  </div>
+ </fieldset>
+ <fieldset class="step" id="rdv-step2"><legend>Vos coordonnées</legend>
+  <div class="form">
+   <div class="row"><div class="fld"><label for="rdv-prenom">Prénom</label><input id="rdv-prenom" type="text" name="prenom" autocomplete="given-name" required aria-required="true"><span class="field-err" id="err-prenom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-nom">Nom</label><input id="rdv-nom" type="text" name="nom" autocomplete="family-name" required aria-required="true"><span class="field-err" id="err-nom-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
+   <div class="row"><div class="fld"><label for="rdv-tel">Téléphone</label><input id="rdv-tel" type="tel" name="tel" autocomplete="tel" required aria-required="true" inputmode="tel"><span class="field-err" id="err-tel-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div><div class="fld"><label for="rdv-email">E-mail <span class="hint inl">(facultatif)</span></label><input id="rdv-email" type="email" name="email" autocomplete="email"><span class="field-err" id="err-email-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div></div>
+   <div class="fld"><label class="chk" for="rdv-consent"><input id="rdv-consent" type="checkbox" name="consent" required aria-required="true"><span>J’accepte que Cime utilise ces informations pour traiter ma demande, conformément à la <a href="/confidentialite/">politique de confidentialité</a> (nLPD).</span></label><span class="field-err" id="err-consent-rdv" hidden><svg class="i" aria-hidden="true"><use href="#i-alert"/></svg><span class="t"></span></span></div>
+   <div class="form-nav"><button type="submit" class="btn" data-cta="rdv_submit">Envoyer ma demande</button><button type="button" class="more" id="rdv-back" hidden>Retour</button></div>
+  </div>
+ </fieldset>
  <p id="rdv-msg" class="msg" role="status"></p>
 </form>
 <aside>
