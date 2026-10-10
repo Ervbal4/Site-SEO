@@ -3,7 +3,7 @@
    À charger après cime.js, uniquement sur les pages /outils/ :
      <script src="[racine]/assets/cime.js" defer></script>
      <script src="[racine]/assets/cime-sim.js" defer></script>
-   Balisage attendu : <div class="sim" data-tool="3a|lpp|avs|cmu|franchise|perte-de-gain|prevoyance-risques"></div>
+   Balisage attendu : <div class="sim" data-tool="3a|lpp|avs|cmu|franchise|perte-de-gain|prevoyance-risques|salaire-net"></div>
 
    Calculs 100 % dans le navigateur, aucune donnée transmise sans demande explicite.
    Les formules sont identiques à la version de référence ; seuls l'interface
@@ -28,7 +28,7 @@ function fmtIn(v,kind){if(typeof v!=='number'||isNaN(v))return'';if(kind==='chf'
 /* ---------- Paramètres officiels ---------- */
 var PL={2026:C.plafond3a||{salarie:7258,independant:36288},2027:C.plafond3a2027||{salarie:7373,independant:36864}};
 var AVS={2026:(C.avsRente||{}).min||1260,2027:(C.avsRente2027||{}).min||1280};
-var LAA_MAX=148200;                                                                  // gain assuré maximal LAA 2026
+var LAA_MAX=148200,AC_MAX=148200,LPP_ENTRY=22680;                                                  // 2026 : gain assuré LAA et AC, seuil d’entrée LPP
 var COORD=(C.lpp||{}).coordination||26460,LPP_MAX=(C.lpp||{}).salaireMax||90720;   // 2026
 var RATE={VD:29,GE:31,VS:25,FR:28,NE:30,JU:29,autre:28};                            // taux marginal moyen indicatif (hypothèse, %)
 var CANTONS=[['VD','Vaud'],['GE','Genève'],['VS','Valais'],['FR','Fribourg'],['NE','Neuchâtel'],['JU','Jura'],['autre','Autre canton']];
@@ -273,7 +273,41 @@ var TOOLS={
     limits:['Le règlement de votre caisse de pension peut prévoir des prestations supérieures au minimum légal : votre certificat prime','La rente AI dépend de la carrière réelle et de la décision de l’office AI ; le délai d’attente avant une rente est d’au moins un an','Sans enfant à charge, une veuve n’a droit à une rente AVS qu’à partir de 45 ans et après cinq ans de mariage ; le capital manquant n’est ni actualisé ni indexé','Les rentes d’orphelins cessent à 18 ans, ou à 25 ans en formation : elles sont ici retenues sur la durée choisie, sans distinguer chaque enfant','Les rentes AVS de survivants ne comprennent pas la 13e rente'],
     method:['Rente AI = rente AVS entière (échelle 44) × fraction selon le degré : 25 % + 2,5 points par point au-dessus de 40 % jusqu’à 49 %, 50 à 69 % égal au degré, 100 % dès 70 %.','Rente LPP d’invalidité = rente à 100 % × 25, 50, 75 ou 100 % selon le degré ; rente à 100 % estimée à partir des bonifications légales jusqu’à la retraite, converties à 6,8 %.','Rente LAA = 80 % du gain assuré × degré d’invalidité, puis limite de surindemnisation de 90 %.','Déficit = revenu cible − rentes − revenu résiduel ; capital manquant = déficit × années jusqu’à la retraite.','Décès : rentes de survivants, plus les capitaux décès divisés par la durée de transition familiale (jusqu’aux 25 ans du plus jeune enfant, ou 5 ans sans enfant).'],
     next:[{t:'Indépendant : prévoyance sans LPP',h:ROOT+'guides/independant-prevoyance-sans-lpp/index.html'},{t:'Comprendre les trois piliers',h:ROOT+'prevoyance/index.html'}],
-    sim:{annee:2026,origine:o.orig,degre_invalidite:o.deg,enfants_a_charge:o.enf,rentes_invalidite_annuelles:Math.round(tot),deficit_invalidite:Math.round(gap),capital_manquant:Math.round(manq),situation_familiale:o.fam,rentes_survivants_annuelles:Math.round(rentes),ecart_deces:Math.round(ec)}}}}
+    sim:{annee:2026,origine:o.orig,degre_invalidite:o.deg,enfants_a_charge:o.enf,rentes_invalidite_annuelles:Math.round(tot),deficit_invalidite:Math.round(gap),capital_manquant:Math.round(manq),situation_familiale:o.fam,rentes_survivants_annuelles:Math.round(rentes),ecart_deces:Math.round(ec)}}}},
+
+ 'salaire-net':{title:'Mon salaire net',sujet:'lpp',
+  steps:[
+   {title:'Votre salaire',why:'Le salaire net estimé est le salaire brut moins les cotisations sociales obligatoires. Les impôts ne sont pas déduits : ils dépendent du canton, du statut et de votre situation.',
+    fields:[{k:'per',rescale:'sal',l:'Le montant saisi est',o:[['annuel','Un salaire annuel brut'],['mensuel','Un salaire mensuel brut (× 12)']],v:'annuel'},
+     {k:'sal',l:'Salaire brut',kind:'chf',v:96000,min:0,max:2000000,s:function(o){return o.per==='mensuel'?[0,30000,100]:[0,300000,1000]},hint:'Avec un 13e salaire, saisissez le total annuel.'},
+     {k:'canton',l:'Canton de travail',o:[['GE','Genève'],['VD','Vaud'],['NE','Neuchâtel'],['FR','Fribourg'],['VS','Valais'],['JU','Jura']],v:'VD'},
+     {k:'statut',l:'Votre statut',o:[['resident','Résident en Suisse'],['frontalier','Frontalier (domicile en France)']],v:'resident'},
+     {k:'age',l:'Âge',kind:'int',unit:'ans',v:40,min:18,max:70,s:[18,65,1],hint:'Les bonifications LPP dépendent de la tranche d’âge : 7, 10, 15 ou 18 %.'},
+     {k:'aanp',l:'Prime assurance accident non professionnel (AANP)',kind:'pct',v:1.2,min:0,max:5,s:[0,3,.05],hint:'Hypothèse : le taux dépend de votre employeur et de son assureur. Voir votre fiche de salaire.'}]}],
+  calc:function(o){
+   var brut=o.per==='mensuel'?o.sal*12:o.sal,avs=brut*.053,ac=Math.min(brut,AC_MAX)*.011,
+    sc=Math.max(0,Math.min(brut,LPP_MAX)-COORD),bon=brk(o.age),lppTot=brut>=LPP_ENTRY?sc*bon:0,lpp=lppTot/2,
+    aanp=Math.min(brut,LAA_MAX)*o.aanp/100,cot=avs+ac+lpp+aanp,net=brut-cot,taux=brut>0?cot/brut*100:0;
+   var imp;
+   if(o.statut==='resident')imp='En tant que résident, vous êtes soit imposé à la source (permis B, par exemple), soit taxé ordinairement sur déclaration. La taxation ordinaire ultérieure (TOU) permet à un contribuable imposé à la source de faire valoir ses déductions réelles.';
+   else if(o.canton==='GE'||o.canton==='FR')imp='Frontalier travaillant à '+CNAME[o.canton]+' : l’impôt est prélevé à la source en Suisse. Selon les revenus du foyer, un statut de quasi-résident peut ouvrir droit aux déductions (3a, rachat LPP) : à faire vérifier.';
+   else imp='Frontalier travaillant à '+CNAME[o.canton]+' : en principe, pas d’impôt à la source en Suisse. Vous êtes imposé en France, sur présentation d’une attestation de résidence fiscale à votre employeur.';
+   var warns=[];
+   if(brut<LPP_ENTRY&&brut>0)warns.push('Sous le seuil d’entrée LPP de '+fmt(LPP_ENTRY)+' par an, l’affiliation à la caisse de pension n’est pas obligatoire : aucune cotisation LPP n’est retenue ici.');
+   if(o.age<25)warns.push('Avant 25 ans, les bonifications de vieillesse LPP ne sont pas dues : seule la couverture des risques est prélevée, et elle n’est pas estimée ici.');
+   return{
+    main:{label:'Salaire net mensuel estimé, avant impôt',value:fmt(net/12,''),unit:'CHF par mois',note:'Soit '+fmt(net)+' par an, après '+fmt(cot)+' de cotisations sociales ('+pc(Math.round(taux*10)/10)+' du brut).'},
+    assumptions:['Salaire brut annuel de '+fmt(brut)+(o.per==='mensuel'?' (salaire mensuel × 12)':''),'AVS, AI et APG : 5,3 % à la charge du salarié','Assurance chômage : 1,1 % jusqu’à '+fmt(AC_MAX)+' de salaire','LPP : bonification de '+pc(Math.round(bon*100))+' pour l’âge de '+o.age+' ans, sur le salaire coordonné ; part du salarié supposée égale à 50 %','AANP : '+pc(o.aanp)+' du salaire, plafonné à '+fmt(LAA_MAX),'Barèmes 2026 ; impôts non déduits'],
+    warns:warns,
+    details:[['AVS, AI, APG (5,3 %)',fmt(avs)+' par an'],['Assurance chômage (1,1 %)',fmt(ac)+' par an'],['LPP, part du salarié',fmt(lpp)+' par an'],['AANP',fmt(aanp)+' par an'],['Total des cotisations',fmt(cot)+' par an'],['Salaire net avant impôt',fmt(net)+' par an']],
+    extra:'<h3>Et les impôts ?</h3><p class="res-p">'+imp+'</p>',
+    bridge:'<div class="bridge"><p><strong>Vous souhaitez optimiser votre net et préparer votre retraite ?</strong></p><p>Votre part LPP de '+fmt(lpp)+' par an alimente votre retraite : un expert lit votre certificat et repère ce qui peut être optimisé.</p><a class="btn" href="'+ROOT+'rendez-vous/index.html?demande=etude&amp;sujet=lpp&amp;profil='+(o.statut==='frontalier'?'frontalier':'resident')+'&amp;canton='+o.canton+'&amp;source=sim-salaire-pont" data-cta="salaire_pont">Faire analyser mon certificat LPP par un expert</a></div>',
+    chartTitle:'Du brut au net (par an)',chart:barsC([{l:'Brut',v:brut,c:COL[0]},{l:'Cotisations',v:cot,c:COL[1]},{l:'Net avant impôt',v:net,c:COL[0]}],'Salaire brut, cotisations sociales et salaire net avant impôt','par an'),
+    limits:['Estimation selon les taux légaux : votre fiche de salaire et le règlement de votre caisse de pension prévalent','Votre caisse peut prélever plus de 50 % des bonifications, ou un taux différent pour les risques','Assurance d’indemnités journalières maladie, frais, impôt et prélèvements propres à votre employeur non pris en compte','Valeurs 2027 : coordination LPP de 26’880 CHF et seuil d’entrée de 23’040 CHF'],
+    method:['AVS, AI, APG = brut × 5,3 %.','Assurance chômage = min(brut ; 148’200 CHF) × 1,1 %.','LPP salarié = (min(brut ; 90’720 CHF) − 26’460 CHF) × taux de bonification de l’âge ÷ 2, dès le seuil d’entrée de 22’680 CHF.','AANP = min(brut ; 148’200 CHF) × taux saisi.','Net avant impôt = brut − cotisations.'],
+    next:[{t:'Estimer ma rente AVS',h:ROOT+'outils/simulateur-avs/index.html'},{t:'Simuler un rachat LPP',h:ROOT+'outils/simulateur-rachat-lpp/index.html'}],
+    sim:{annee:2026,canton:o.canton,statut:o.statut,age:o.age,salaire_brut:Math.round(brut),cotisations:Math.round(cot),lpp_salarie:Math.round(lpp),net_avant_impot:Math.round(net)}}}}
+
 
 };
 
@@ -285,6 +319,7 @@ function render(r,key){
  (r.warns||[]).forEach(function(w){h+='<p class="res-warn">'+ic('alert')+'<span>'+w+'</span></p>'});
  h+='<h3>Détail</h3><dl class="res-dl">'+r.details.map(function(d){return'<div><dt>'+d[0]+'</dt><dd>'+d[1]+'</dd></div>'}).join('')+'</dl>';
  if(r.extra)h+=r.extra;
+ if(r.bridge)h+=r.bridge;
  if(r.chart)h+='<h3>'+r.chartTitle+'</h3><figure class="res-chart">'+r.chart+'</figure>';
  h+='<details class="res-more"><summary>Limites et méthode de calcul</summary><div><p><strong>Limites</strong></p><ul>'+r.limits.map(function(a){return'<li>'+a+'</li>'}).join('')+'</ul><p><strong>Formules</strong></p><ul>'+r.method.map(function(m){return'<li>'+m+'</li>'}).join('')+'</ul></div></details>';
  h+='<div class="res-next">'+(r.next||[]).map(function(n){return'<a class="link" href="'+n.h+'">'+n.t+' '+ic('arrow')+'</a>'}).join('')+'<a class="link" href="#etude" data-cta="sim_to_form_'+key+'">Recevoir mon étude comparative '+ic('arrow')+'</a></div>';
@@ -367,6 +402,7 @@ function build(root){
  inp.addEventListener('change',function(e){var t=e.target,k=t.getAttribute('data-k')||t.getAttribute('data-r');if(!k)return;
   var f=fields.filter(function(x){return x.k===k})[0];
   if(f&&f.sets&&f.sets.map[t.value]!==undefined){el(f.sets.k).value=fmtIn(f.sets.map[t.value],'pct')}
+  if(f&&f.rescale){var tg=el(f.rescale),pv=parseNum(tg.value);if(!isNaN(pv)){var nv=Math.round(pv*(t.value==='mensuel'?1/12:12)/ (t.value==='mensuel'?1:1));tg.value=fmtIn(nv,'chf')}}
   if(f&&!f.o&&t.getAttribute('data-k')){var v=parseNum(t.value);if(!isNaN(v)&&v>=f.min&&v<=f.max)t.value=fmtIn(v,f.kind)}
   run(true)});
  show(0,false);run(false);

@@ -119,7 +119,7 @@ $$('form[data-lead]').forEach(function(f){
   var rules={};chk.forEach(function(n){if(n)rules[n]=false});req.forEach(function(n){if(n)rules[n]=true});
   var msg=f.querySelector('.msg[role=status]');
   // Préremplissage depuis l'URL (?demande=echange&sujet=lpp&profil=independant)
-  ['demande','sujet','profil'].forEach(function(k){
+  ['demande','sujet','profil','canton'].forEach(function(k){
     var v=params.get(k),el=f.elements[k];if(!v||!el)return;
     if(el.tagName==='SELECT'){if([].some.call(el.options,function(o){return o.value===v}))el.value=v}
     else if(el.length){[].forEach.call(el,function(r){if(r.value===v)r.checked=true})}
@@ -148,6 +148,9 @@ $$('form[data-lead]').forEach(function(f){
     if(CimeLead.validate(f,rules)){CimeLead.status(msg,'err','Certains champs sont à compléter avant l’envoi.');return}
     var d={};new FormData(f).forEach(function(v,k){d[k]=typeof v==='string'?v.trim():v});
     d.consent=d.consent?'oui':'non';
+    // Cases à cocher multiples (data-multi) : transmises en liste séparée par des virgules
+    var mu={};$$('input[type=checkbox][data-multi]',f).forEach(function(c){if(c.checked)(mu[c.name]=mu[c.name]||[]).push(c.value)});
+    Object.keys(mu).forEach(function(k){d[k]=mu[k].join(', ')});
     ['canton','versement'].forEach(function(k){if(params.get(k))d[k]=params.get(k)});
     // Données complémentaires fournies par la page (ex. résultats d'un simulateur)
     if(typeof window.CimeLeadExtra==='function'){try{Object.assign(d,window.CimeLeadExtra(f)||{})}catch(_){}}
@@ -184,6 +187,62 @@ $$('form[data-lead]').forEach(function(f){
       else if(e.key==='Home')n=0;else if(e.key==='End')n=tabs.length-1;else return;
       e.preventDefault();sel(n,true)});
   });
+})();
+
+
+/* ---------- Créneaux souhaités (page rendez-vous) ----------
+   <div data-slots hidden> : propose les 5 prochains jours ouvrés × 3 plages, écrit le choix dans <input name="creneau">.
+   Le créneau est un souhait : l'expert le confirme par téléphone ou par e-mail. */
+(function(){
+  var box=doc.querySelector('[data-slots]');if(!box)return;
+  var f=box.closest('form'),inp=f&&f.elements['creneau'];if(!inp)return;
+  var P=[['Matin','9 h – 12 h'],['Midi','12 h – 14 h'],['Après-midi','14 h – 18 h']],D=[],d=new Date();
+  while(D.length<5){d=new Date(d.getTime()+864e5);if(d.getDay()!==0&&d.getDay()!==6)D.push(new Date(d))}
+  var fd=new Intl.DateTimeFormat('fr-CH',{weekday:'short',day:'numeric',month:'short'});
+  var h='<div class="slot-grid" role="radiogroup" aria-label="Créneau souhaité">';
+  D.forEach(function(x,i){h+='<div class="slot-col"><p class="slot-day">'+fd.format(x)+'</p>'+P.map(function(p,j){return'<button type="button" class="slot" role="radio" aria-checked="false" data-v="'+fd.format(x)+', '+p[0].toLowerCase()+' ('+p[1]+')"><b>'+p[0]+'</b><span>'+p[1]+'</span></button>'}).join('')+'</div>'});
+  box.insertAdjacentHTML('beforeend',h+'</div><p class="hint blk">Souhait de créneau : nous le confirmons par téléphone ou par e-mail.</p>');
+  box.addEventListener('click',function(e){var b=e.target.closest('.slot');if(!b)return;var on=b.getAttribute('aria-checked')==='true';
+    $$('.slot',box).forEach(function(x){x.setAttribute('aria-checked','false')});
+    if(!on){b.setAttribute('aria-checked','true');inp.value=b.getAttribute('data-v')}else inp.value='';track('rdv_slot',{})});
+  var radios=$$('input[name=demande]',f);
+  function sync(){var r=radios.filter(function(x){return x.checked})[0];box.hidden=!(r&&r.value==='echange');if(box.hidden){inp.value='';$$('.slot',box).forEach(function(x){x.setAttribute('aria-checked','false')})}}
+  radios.forEach(function(r){r.addEventListener('change',sync)});sync();
+})();
+
+/* ---------- Agenda des échéances (/agenda/) ----------
+   <li class="ev" data-m="3" data-d="31" data-t="…" data-desc="…" data-cat="fiscal"> : date de la prochaine échéance,
+   filtre par thème et export .ics (événement annuel récurrent, rappel 15 jours avant). */
+(function(){
+  var list=doc.querySelector('.agenda-list');if(!list)return;
+  var evs=$$('.ev',list),now=new Date(),t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  var fm=new Intl.DateTimeFormat('fr-CH',{day:'numeric',month:'long',year:'numeric'});
+  function next(m,d){var x=new Date(now.getFullYear(),m-1,d);if(x<t0)x=new Date(now.getFullYear()+1,m-1,d);return x}
+  function pad(n){return(n<10?'0':'')+n}
+  function ymd(x){return x.getFullYear()+pad(x.getMonth()+1)+pad(x.getDate())}
+  evs.forEach(function(el){
+    var m=+el.getAttribute('data-m'),d=+el.getAttribute('data-d'),x=next(m,d),days=Math.round((x-t0)/864e5);
+    el._d=x;var n=el.querySelector('.ev-next');
+    if(n&&!n.textContent)n.textContent='Prochaine échéance : '+fm.format(x)+(days===0?' (aujourd’hui)':days===1?' (demain)':' (dans '+days+' jours)');
+    el.setAttribute('data-days',days);
+    var b=el.querySelector('[data-ics]');
+    if(b)b.addEventListener('click',function(){
+      var x2=el._d,e2=new Date(x2.getTime()+864e5),u='cime-'+m+'-'+d+'@assurementsuisse';
+      var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//assurementSuisse//Agenda//FR','BEGIN:VEVENT','UID:'+u,'DTSTAMP:'+ymd(new Date())+'T000000Z',
+       'DTSTART;VALUE=DATE:'+ymd(x2),'DTEND;VALUE=DATE:'+ymd(e2),'RRULE:FREQ=YEARLY','SUMMARY:'+el.getAttribute('data-t'),
+       'DESCRIPTION:'+el.getAttribute('data-desc').replace(/,/g,'\\,'),'BEGIN:VALARM','TRIGGER:-P15D','ACTION:DISPLAY','DESCRIPTION:Échéance dans 15 jours','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+      var a=doc.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar;charset=utf-8'}));a.download='echeance-'+m+'-'+d+'.ics';doc.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);track('agenda_ics',{event:el.getAttribute('data-t')});
+    });
+  });
+  // tri par prochaine échéance
+  evs.slice().sort(function(a,b){return a._d-b._d}).forEach(function(el){list.appendChild(el)});
+  var first=list.querySelector('.ev');if(first)first.classList.add('first');
+  var nx=doc.querySelector('[data-next-ev]');if(nx&&first){nx.textContent=first.getAttribute('data-t')+' : '+fm.format(first._d)}
+  // filtres
+  $$('[data-filter]').forEach(function(b){b.addEventListener('click',function(){
+    var k=b.getAttribute('data-filter');$$('[data-filter]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    evs.forEach(function(el){el.hidden=!(k==='all'||(el.getAttribute('data-cat')||'').split(' ').indexOf(k)>-1)})})});
 })();
 
 /* ---------- 5. Navigation & en-tête ---------- */

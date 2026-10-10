@@ -773,3 +773,85 @@ footer.site .legal p{font-size:var(--fs-cap)}
 .faq-grid>*,.q-grid>*,.commit>*,.contact>*,.est-grid>*{min-width:0}
 .logo .w2{font-weight:700;color:var(--emerald);margin-left:-10px}
 footer.site .logo .w2{color:var(--on-petrol-accent)}
+
+/* ---------- 23. Refonte CRO : fiscalité, cas, agenda, créneaux, appel à l'action ---------- */
+.btn:not(.ghost):not(.light):not(.ghost-light){box-shadow:0 8px 18px -10px rgba(14,65,53,.65),inset 0 -2px 0 rgba(0,0,0,.12)}
+.btn:not(.ghost):not(.light):not(.ghost-light):hover{box-shadow:0 12px 26px -10px rgba(14,65,53,.7),inset 0 -2px 0 rgba(0,0,0,.12)}
+.btn:focus-visible,.fchip:focus-visible,.slot:focus-visible{outline:3px solid var(--emerald);outline-offset:3px}
+.btn.sm{min-height:44px;padding:10px 18px;font-size:.9375rem}
+.hero .acts .btn:first-child,.fisc-cta .btn{min-height:56px;padding-inline:32px}
+.hero .acts .btn.ghost{border-color:var(--emerald);color:var(--emerald);border-width:2px}
+.sticky{background:rgba(248,250,252,.97);border-top:1px solid var(--line-strong);box-shadow:0 -8px 24px -14px rgba(14,65,53,.4)}
+.sticky .btn{min-height:54px;font-size:1.0625rem}
+.sticky .btn .i{width:1.25em;height:1.25em;flex:none}
+
+.fisc{background:var(--lichen)}
+.fisc-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(24px,4vw,56px);align-items:start}
+.fisc-copy h2{max-width:22ch}
+.fisc-lead{font-size:1.0625rem;line-height:1.6;margin:var(--s-3) 0 0}
+.fisc-claim{margin:var(--s-4) 0 0;padding:14px 18px;border-left:4px solid var(--emerald);background:var(--paper);border-radius:0 var(--r-1) var(--r-1) 0;font-size:1.0625rem;line-height:1.55}
+.fisc-claim strong{color:var(--emerald);white-space:nowrap}
+.fisc-note{margin:var(--s-2) 0 0;font-size:var(--fs-cap);color:var(--text-2);line-height:1.5}
+.fisc-cards{display:grid;gap:var(--s-3)}
+.fisc-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2,12px);padding:var(--s-4) var(--s-5)}
+.fisc-card h3{font-size:1.0625rem;margin:0 0 var(--s-2)}
+.fisc-card p{margin:0;font-size:.9688rem;line-height:1.55;color:var(--text-2)}
+.fisc-cta{display:flex;flex-wrap:wrap;gap:var(--s-3) var(--s-5);align-items:center;margin-top:var(--s-5)}
+@media(max-width:860px){.fisc-grid{grid-template-columns:1fr}.fisc-cta .btn{width:100%}}
+
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-4)}
+.case{display:flex;flex-direction:column;gap:var(--s-2);background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2,12px);padding:var(--s-5)}
+.case h3,.case h2{font-size:1.1875rem;line-height:1.3;margin:0}
+.case p{margin:0;color:var(--text-2);line-height:1.55}
+.case .btn{margin-top:auto;align-self:flex-start}
+.case-tag{font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--emerald)!important}
+.case>.btn{margin-top:var(--s-4)}
+.cases-full{grid-template-columns:1fr;max-width:860px;margin-inline:auto}
+.case-full{padding:var(--s-6,32px)}
+.case-full dl{display:grid;gap:var(--s-3);margin:var(--s-3) 0 0}
+.case-full dt{font-size:.8125rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.case-full dd{margin:0;line-height:1.6;color:var(--text-2)}
+@media(max-width:960px){.cases{grid-template-columns:1fr}.case .btn{align-self:stretch}}
+
+.agenda-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(24px,4vw,56px);align-items:start}
+.agenda-grid>*{min-width:0}
+.filters{display:flex;flex-wrap:wrap;gap:var(--s-2);margin-bottom:var(--s-4)}
+.fchip{min-height:44px;padding:8px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line-strong);background:var(--paper);color:var(--text);font:600 .9375rem/1 var(--f-sans);cursor:pointer}
+.fchip[aria-pressed=true]{background:var(--emerald);border-color:var(--emerald);color:#fff}
+.agenda-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.ev{display:grid;grid-template-columns:76px 1fr;gap:var(--s-4);background:var(--paper);border:1px solid var(--line);border-radius:var(--r-2,12px);padding:var(--s-4) var(--s-5)}
+.ev[hidden]{display:none}
+.ev.first{border-color:var(--emerald);box-shadow:0 0 0 3px rgba(22,84,70,.12)}
+.ev-date{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r-1);background:var(--lichen);color:var(--emerald);text-align:center;padding:10px 4px;align-self:start}
+.ev-date b{font:700 1.5rem/1 var(--f-sans)}
+.ev-date span{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.ev-body h3{font-size:1.0625rem;line-height:1.35;margin:0 0 var(--s-2)}
+.ev-body p{margin:0 0 var(--s-2);color:var(--text-2);line-height:1.55;font-size:.9688rem}
+.ev-body .ev-next{font-weight:600;color:var(--text)}
+.ev-acts{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-4);align-items:center}
+.checks{display:grid;gap:var(--s-2)}
+@media(max-width:960px){.agenda-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.ev{grid-template-columns:1fr;padding:var(--s-4)}.ev-date{flex-direction:row;gap:8px;justify-self:start;padding:6px 14px}.ev-acts .btn{width:100%}}
+
+.slots-box{display:grid;gap:var(--s-2)}
+.slots-box .lbl{margin:0;font-weight:600}
+.mt-s{margin-top:var(--s-2)}
+.slot-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--s-2)}
+.slot-col{display:grid;gap:6px;align-content:start}
+.slot-day{margin:0 0 2px;font-size:.8125rem;font-weight:700;text-align:center;color:var(--text);text-transform:capitalize}
+.slot{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;padding:6px 4px;border-radius:var(--r-1);border:1.5px solid var(--line-strong);background:var(--paper);color:var(--text);cursor:pointer;font-family:inherit}
+.slot b{font-size:.875rem}
+.slot span{font-size:.75rem;color:var(--text-2)}
+.slot:hover{border-color:var(--emerald)}
+.slot[aria-checked=true]{background:var(--emerald);border-color:var(--emerald);color:#fff}
+.slot[aria-checked=true] span{color:#E6F0EC}
+@media(max-width:720px){.slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.slot-col:last-child{grid-column:1/-1}}
+
+.sim .bridge{display:grid;gap:var(--s-3);margin-top:var(--s-5);padding:var(--s-5);border-radius:var(--r-2,12px);background:var(--petrol);color:var(--on-petrol)}
+.sim .bridge p{margin:0;color:inherit}
+.sim .bridge .btn{background:var(--on-petrol);color:var(--petrol);justify-self:start}
+@media(max-width:560px){.sim .bridge .btn{justify-self:stretch}}
+.sim .bridge p strong{font-size:1.125rem}
+.sim .bridge a.btn{text-decoration:none}
+.hero h1{max-width:20ch;font-size:clamp(2rem,4.3vw,3.4rem);line-height:1.08}
+.hero .acts{flex-wrap:wrap}
